@@ -19,7 +19,7 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.cleanup()
 
-# Daten über den Pin 14 auslehsen
+# Daten über DHT11 auslesen
 instance = dht11.DHT11(pin = 4)
 
 print("STRG+C Druecken zum beenden.") # print Befehl für Ausgabe zum beenden des Scriptes
@@ -31,13 +31,18 @@ try:
     result = instance.read()
     while not result.is_valid(): # lesen, bis das Ergebnis valide ist 
         result = instance.read()
-    print(result.temperature)
+    print("temp: ", result.temperature)
+    print("humidity: ", result.humidity)
 
     segment.fill(0)
 
-    # Anzeige für die Stunden.
+    # Anzeige der Temperatur
     segment[0] =  str(int(result.temperature / 10))          # Zehnerzahlen
     segment[1] =   str(int(result.temperature % 10))         # Einerzahlen
+    
+    # Anzeige der Luftfeuchtigkeit
+    segment[2] = str(int(result.humidity / 10))
+    segment[3] = str(int(result.humidity % 10))
     segment.colon = False
 
 
