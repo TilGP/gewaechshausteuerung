@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# V3
+# V4
 
 import time
 import datetime
@@ -20,7 +19,7 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.cleanup()
 
-# Daten über DHT11 auslesen
+# DHT11-Sensor Instanz initialisieren 
 instance = dht11.DHT11(pin = 4)
 
 print("STRG+C Druecken zum beenden.") # print Befehl für Ausgabe zum beenden des Scriptes
@@ -30,7 +29,7 @@ try:
   while(True):
     
     result = instance.read()
-    while not result.is_valid(): # lesen, bis das Ergebnis valide ist 
+    while not result.is_valid(): # Messwerte mit dem DHT11 auslesen, bis das Ergebnis valide ist 
         result = instance.read()
     print("temp: ", result.temperature)
     print("humidity: ", result.humidity)
@@ -38,12 +37,12 @@ try:
     segment.fill(0)
 
     # Anzeige der Temperatur
-    segment[0] =  str(int(result.temperature / 10))          # Zehnerzahlen
-    segment[1] =   str(int(result.temperature % 10))         # Einerzahlen
+    segment[0] =  str(int(result.temperature / 10)) # Zehnerstelle
+    segment[1] =  str(int(result.temperature % 10)) # Einerstelle
     
     # Anzeige der Luftfeuchtigkeit
-    segment[2] = str(int(result.humidity / 10))
-    segment[3] = str(int(result.humidity % 10))
+    segment[2] = str(int(result.humidity / 10)) # Zehnerstelle
+    segment[3] = str(int(result.humidity % 10)) # Einerstelle
     segment.colon = False
 
 
