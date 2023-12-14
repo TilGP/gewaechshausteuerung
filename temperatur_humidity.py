@@ -1,16 +1,18 @@
 #!/usr/bin/python
-# V4
+# V3
 
 import time
 import datetime
 import board
 import RPi.GPIO as GPIO
+import busio
 import dht11
 
 # aus dem Adafruit_LED_Backpack die 7-Segment-Display Klasse importieren.
 from adafruit_ht16k33.segments import Seg7x4
+import adafruit_character_lcd.character_lcd_i2c as character_lcd
 
-i2c = board.I2C()
+i2c = busio.I2C(board.SCL, board.SDA)
 segment = Seg7x4(i2c, address=0x70) # segment der I2C Adresse 0x70 und die Displaydefinition zuweisen
 
 segment.fill(0) # Initialisierung des Displays. Muss einmal ausgeführt werden bevor das Display benutzt wird.
@@ -18,6 +20,16 @@ segment.fill(0) # Initialisierung des Displays. Muss einmal ausgeführt werden b
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.cleanup()
+
+# Definiere LCD Zeilen und Spaltenanzahl.
+lcd_columns = 16
+lcd_rows    = 2
+
+#Festlegen des LCDs in die Variable LCD
+lcd = character_lcd.Character_LCD_I2C(i2c, lcd_columns, lcd_rows, 0x21)
+
+# Hintergrundbeleuchtung einschalten
+lcd.backlight = True  
 
 # DHT11-Sensor Instanz initialisieren 
 instance = dht11.DHT11(pin = 4)
@@ -47,7 +59,12 @@ try:
 
 
     segment.show() # Wird benötigt um die Display LEDs zu updaten.
+    lcd.message = f"temp: {result.temperature}\nhumidity: {result.humidity}"
 
     time.sleep(20) # Warte zwei Sekunden
 except KeyboardInterrupt: # Fange ein STRG+C ab und schalte das Display aus
     segment.fill(0)
+    
+    # LCD ausschalten.
+    lcd.clear()
+    lcd.backlight = False
