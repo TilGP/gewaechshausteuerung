@@ -78,14 +78,8 @@ try:
         ):  # Messwerte mit dem DHT11 auslesen, bis das Ergebnis valide ist
             result = instance.read()
 
-        temperature = result.temperature / 10.0  # Temperatur mit einer Dezimalstelle
-        humidity = result.humidity / 10  # Feuchtigkeit mit einer Dezimalstelle
-
         # Die Temperatur auf den LCD anzeigen lassen
-        round(temperature, 0)
-        lcd.message = (
-            f"Temp: {result.temperature / 10.0}°C\nrF: {result.humidity / 10}%"
-        )
+        lcd.message = f"Temp: {result.temperature}°C\nrF: {result.humidity}%"
 
         # Anzeige der Temperatur
         segment[0] = str(int(result.temperature / 10))  # Zehnerstelle
