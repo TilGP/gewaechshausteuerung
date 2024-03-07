@@ -88,7 +88,7 @@ try:
         # Anzeige der Luftfeuchtigkeit
         segment[2] = str(int(result.humidity / 10))  # Zehnerstelle
         segment[3] = str(int(result.humidity % 10))  # Einerstelle
-        segment.colon = False
+        segment.colon = True
 
         segment.show()  # Wird benötigt um die Display LEDs zu updaten.
 
