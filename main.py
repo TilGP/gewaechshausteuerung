@@ -12,6 +12,10 @@ from luma.core.render import canvas
 from luma.core.legacy import text, show_message
 from luma.core.legacy.font import proportional, CP437_FONT
 
+LIGHT_LEVEL_TOLERANCE = 100
+LCD_COLUMNS = 16
+LCD_ROWS = 2
+
 # Initialisierung des I2C-Displays
 i2c = board.I2C()
 segment = Seg7x4(i2c, address=0x70)
@@ -23,14 +27,12 @@ GPIO.setmode(GPIO.BCM)
 GPIO.cleanup()
 instance = dht11.DHT11(pin=4)
 # Definiere LCD Zeilen und Spaltenanzahl.
-lcd_columns = 16
-lcd_rows = 2
 
 # Initialisierung I2C Bus
 i2c_lcd = busio.I2C(board.SCL, board.SDA)
 
 # Festlegen des LCDs in die Variable LCD
-lcd = character_lcd.Character_LCD_I2C(i2c_lcd, lcd_columns, lcd_rows, 0x21)
+lcd = character_lcd.Character_LCD_I2C(i2c_lcd, LCD_COLUMNS, LCD_ROWS, 0x21)
 
 
 # Matrix Gerät festlegen und erstellen.
@@ -65,68 +67,48 @@ class LightSensor:
 
 
 light_sensor = LightSensor()
-tolerance = 100
 
 try:
     print("STRG+C Druecken zum Beenden.")
     while True:
         # Daten vom DHT11-Sensor auslesen
         result = instance.read()
+        while (
+            not result.is_valid()
+        ):  # Messwerte mit dem DHT11 auslesen, bis das Ergebnis valide ist
+            result = instance.read()
 
-        if result.is_valid():
-            temperature = (
-                result.temperature / 10.0
-            )  # Temperatur mit einer Dezimalstelle
-            humidity = result.humidity / 10  # Feuchtigkeit mit einer Dezimalstelle
+        temperature = result.temperature / 10.0  # Temperatur mit einer Dezimalstelle
+        humidity = result.humidity / 10  # Feuchtigkeit mit einer Dezimalstelle
 
-            # Die Temperatur auf den LCD anzeigen lassen
-            round(temperature, 0)
-            lcd.message = "Temp: {}C\nHumidity: {}%".format(
-                temperature * 10, int(humidity * 10)
-            )
-            lcd.message = f"Temperatur: {temperature}°C\nFeuchtigkeit: {humidity}%"
+        # Die Temperatur auf den LCD anzeigen lassen
+        round(temperature, 0)
+        lcd.message = (
+            f"Temp: {result.temperature / 10.0}°C\nrF: {result.humidity / 10}%"
+        )
 
-            # Die Temperatur auf dem 7-Segment-LED-Display anzeigen
-            segment[0] = str(int(temperature))  # Zehner
-            segment[1] = str(int((temperature * 10) % 10))  # Einer
-            segment[1] = "."  # Punkt als Nachkommastelle
-            segment[2] = str(int((temperature * 100) % 10))  # Nachkommastelle
-            segment[3] = "C"  # Einheit (Celsius)
-            segment.show()
+        # Anzeige der Temperatur
+        segment[0] = str(int(result.temperature / 10))  # Zehnerstelle
+        segment[1] = str(int(result.temperature % 10))  # Einerstelle
 
-            time.sleep(2)  # warten
+        # Anzeige der Luftfeuchtigkeit
+        segment[2] = str(int(result.humidity / 10))  # Zehnerstelle
+        segment[3] = str(int(result.humidity % 10))  # Einerstelle
+        segment.colon = False
 
-            # Anzeige der Feuchtigkeit auf dem 7-Segment-LED-Display
-            segment[0] = str(int(humidity))  # Zehner
-            segment[1] = str(int((humidity * 10) % 10))  # Einer
-            segment[1] = "."  # Punkt als Nachkommastelle
-            segment[2] = str(int((humidity * 100) % 10))  # Nachkommastelle
-            segment[3] = "F"  # F für Feuchtigkeit
-            segment.show()
+        segment.show()  # Wird benötigt um die Display LEDs zu updaten.
 
-            # Aktuellen Lichtpegel messen
-            light_level = light_sensor.readLight()
+        # Aktuellen Lichtpegel messen
+        light_level = light_sensor.readLight()
 
-            # Anzeige auf der Matrix je nach Lichtpegel
-            if light_level > 700 + tolerance:  # zu hell
-                display_on_matrix(matrix_device, ":o")
-            elif light_level < 700 - tolerance:  # zu dunkel
-                display_on_matrix(matrix_device, ":(")
-            else:  # optimal
-                display_on_matrix(matrix_device, ":)")
+        # Anzeige auf der Matrix je nach Lichtpegel
+        if light_level > 700 + LIGHT_LEVEL_TOLERANCE:  # zu hell
+            display_on_matrix(matrix_device, ":o")
+        elif light_level < 700 - LIGHT_LEVEL_TOLERANCE:  # zu dunkel
+            display_on_matrix(matrix_device, ":(")
+        else:  # optimal
+            display_on_matrix(matrix_device, ":)")
 
-            # Anzeige der Feuchtigkeit auf dem 7-Segment-LED-Display
-            segment[0] = str(int(humidity))  # Zehner
-            segment[1] = str(int((humidity * 10) % 10))  # Einer
-            segment[1] = "."  # Punkt als Nachkommastelle
-            segment[2] = str(int((humidity * 100) % 10))  # Nachkommastelle
-            segment[3] = "F"  # F für Feuchtigkeit
-            segment.show()
-        else:
-            # Wenn ein DHT11-Fehler auftritt, dann Anzeigen von "FAIL"
-            segment.print("FA1L")
-
-        time.sleep(2)  # warten
 
 except KeyboardInterrupt:
     segment.fill(0)
