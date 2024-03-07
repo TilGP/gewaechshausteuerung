@@ -5,7 +5,7 @@ from luma.led_matrix.device import max7219
 from luma.core.legacy import text
 
 serial = spi(port=0, device=1, gpio=noop())
-device = max7219(serial, rotate=1)
+device = max7219(serial, cascaded=1, block_orientation=90, rotate=0)
 
 # Box and text rendered in portrait mode
 device.clear()
