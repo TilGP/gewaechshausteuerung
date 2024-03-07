@@ -9,8 +9,16 @@ device = max7219(serial, rotate=1)
 # Box and text rendered in portrait mode
 device.clear()
 
-with canvas(device) as draw:
-    print(dir(draw.shape.__init__))
-    # draw.rectangle(device.bounding_box, outline="white", fill="black")
 
-# sleep(10)
+# Funktion zur Anzeige auf der Matrix je nach Lichtpegel
+def display_on_matrix(device, message):
+    with canvas(device) as draw:
+        text(draw, (0, 0), message, fill="white", font=proportional(CP437_FONT))
+
+
+display_on_matrix(device, ":(")
+sleep(10)
+display_on_matrix(device, ":)")
+sleep(10)
+display_on_matrix(device, ":o")
+sleep(10)
