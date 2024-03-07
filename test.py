@@ -2,6 +2,7 @@ from time import sleep
 from luma.core.interface.serial import spi, noop
 from luma.core.render import canvas
 from luma.led_matrix.device import max7219
+from luma.core.legacy import text
 
 serial = spi(port=0, device=1, gpio=noop())
 device = max7219(serial, rotate=1)
@@ -13,7 +14,7 @@ device.clear()
 # Funktion zur Anzeige auf der Matrix je nach Lichtpegel
 def display_on_matrix(device, message):
     with canvas(device) as draw:
-        draw.text(draw, (0, 0), message, fill="white")
+        text(draw, (0, 0), message, fill="white")
 
 
 display_on_matrix(device, ":(")
