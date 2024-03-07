@@ -79,7 +79,7 @@ try:
             result = instance.read()
 
         # Die Temperatur auf den LCD anzeigen lassen
-        lcd.message = f"Temp: {result.temperature}°C\nrF: {result.humidity}%"
+        lcd.message = f"Temp: {result.temperature}C\nrF: {result.humidity}%"
 
         # Anzeige der Temperatur
         segment[0] = str(int(result.temperature / 10))  # Zehnerstelle
