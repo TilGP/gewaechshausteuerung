@@ -14,7 +14,7 @@ device.clear()
 # Funktion zur Anzeige auf der Matrix je nach Lichtpegel
 def display_on_matrix(device, message):
     with canvas(device) as draw:
-        text(draw, (0, 0), message, fill="white")
+        text(draw, (0, 0), message, fill="white", font=proportional(CP437_FONT))
 
 
 display_on_matrix(device, ":(")
