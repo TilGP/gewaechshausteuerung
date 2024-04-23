@@ -103,7 +103,7 @@ try:
         else:  # optimal
             display_on_matrix(matrix_device, ":)")
 
-        time.sleep(10)  # warten
+        time.sleep(1)  # warten
 
 except KeyboardInterrupt:
     segment.fill(0)
