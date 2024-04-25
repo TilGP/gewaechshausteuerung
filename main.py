@@ -12,8 +12,8 @@ from luma.core.render import canvas
 from luma.core.legacy import text, show_message
 from luma.core.legacy.font import proportional, CP437_FONT
 
-LIGHT_LEVEL_TOLERANCE = 10_000
-OPTIOMAL_LIGHT_LEVEL = 45_000
+LIGHT_LEVEL_TOLERANCE = 5_000
+OPTIOMAL_LIGHT_LEVEL = 30_000
 
 # Initialisierung des I2C-Displays
 i2c = board.I2C()
