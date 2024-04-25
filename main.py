@@ -14,8 +14,6 @@ from luma.core.legacy.font import proportional, CP437_FONT
 
 LIGHT_LEVEL_TOLERANCE = 10_000
 OPTIOMAL_LIGHT_LEVEL = 50_000
-LCD_COLUMNS = 16
-LCD_ROWS = 2
 
 # Initialisierung des I2C-Displays
 i2c = board.I2C()
@@ -27,7 +25,10 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.cleanup()
 instance = dht11.DHT11(pin=4)
+
 # Definiere LCD Zeilen und Spaltenanzahl.
+LCD_COLUMNS = 16
+LCD_ROWS = 2
 
 # Initialisierung I2C Bus
 i2c_lcd = busio.I2C(board.SCL, board.SDA)
