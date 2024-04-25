@@ -12,7 +12,8 @@ from luma.core.render import canvas
 from luma.core.legacy import text, show_message
 from luma.core.legacy.font import proportional, CP437_FONT
 
-LIGHT_LEVEL_TOLERANCE = 100
+LIGHT_LEVEL_TOLERANCE = 10_000
+OPTIOMAL_LIGHT_LEVEL = 50_000
 LCD_COLUMNS = 16
 LCD_ROWS = 2
 
@@ -96,9 +97,9 @@ try:
         light_level = light_sensor.readLight()
 
         # Anzeige auf der Matrix je nach Lichtpegel
-        if light_level > 700 + LIGHT_LEVEL_TOLERANCE:  # zu hell
+        if light_level > OPTIOMAL_LIGHT_LEVEL + LIGHT_LEVEL_TOLERANCE:  # zu hell
             display_on_matrix(matrix_device, ":o")
-        elif light_level < 700 - LIGHT_LEVEL_TOLERANCE:  # zu dunkel
+        elif light_level < OPTIOMAL_LIGHT_LEVEL - LIGHT_LEVEL_TOLERANCE:  # zu dunkel
             display_on_matrix(matrix_device, ":(")
         else:  # optimal
             display_on_matrix(matrix_device, ":)")
