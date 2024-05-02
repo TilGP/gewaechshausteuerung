@@ -21,7 +21,15 @@ OPTIOMAL_LIGHT_LEVEL = 40_000
 csv_file = open("data.csv", "w", newline="")
 csv_writer = csv.writer(csv_file)
 
-csv_writer.writerow(["Time", "Temperature", "Humidity", "Light Level"])
+csv_writer.writerow(
+    [
+        "Datum",
+        "Zeit",
+        "Temperatur (in °C)",
+        "Luftfeuchtigkeit (in %)",
+        "Helligkeit (in Lux)",
+    ]
+)
 
 # Initialisierung des I2C-Displays
 i2c = board.I2C()
@@ -113,8 +121,15 @@ try:
         else:  # optimal
             display_on_matrix(matrix_device, ":)")
 
+        dt = datetime.now()
         csv_writer.writerow(
-            [datetime.now(), result.temperature, result.humidity, light_level]
+            [
+                dt.strftime("%d.%m.%Y"),
+                dt.strftime("%H:%M:%S"),
+                round(result.temperature, 2),
+                round(result.humidity, 2),
+                round(light_level, 2),
+            ]
         )
 
         time.sleep(1)  # warten
