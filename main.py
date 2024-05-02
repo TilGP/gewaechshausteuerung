@@ -1,4 +1,5 @@
 import csv
+import os
 import time
 from datetime import datetime
 
@@ -18,18 +19,24 @@ from luma.led_matrix.device import max7219
 LIGHT_LEVEL_TOLERANCE = 5_000
 OPTIOMAL_LIGHT_LEVEL = 40_000
 
-csv_file = open("data.csv", "w", newline="")
+csv_file_name = "data.csv"
+file_exists = False
+if os.path.exists(csv_file_name):
+    file_exists = True
+
+csv_file = open(csv_file_name, "w", newline="")
 csv_writer = csv.writer(csv_file)
 
-csv_writer.writerow(
-    [
-        "Datum",
-        "Zeit",
-        "Temperatur (in °C)",
-        "Luftfeuchtigkeit (in %)",
-        "Helligkeit (in Lux)",
-    ]
-)
+if not file_exists:
+    csv_writer.writerow(
+        [
+            "Datum",
+            "Zeit",
+            "Temperatur (in °C)",
+            "Luftfeuchtigkeit (in %)",
+            "Helligkeit (in Lux)",
+        ]
+    )
 
 # Initialisierung des I2C-Displays
 i2c = board.I2C()
