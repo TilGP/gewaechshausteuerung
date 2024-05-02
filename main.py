@@ -1,19 +1,27 @@
+import csv
 import time
-import board
-import RPi.GPIO as GPIO
-import dht11
-import busio
-from adafruit_ht16k33.segments import Seg7x4
+from datetime import datetime
+
 import adafruit_character_lcd.character_lcd_i2c as character_lcd
+import board
+import busio
+import dht11
+import RPi.GPIO as GPIO
 import smbus
-from luma.led_matrix.device import max7219
-from luma.core.interface.serial import spi, noop
+from adafruit_ht16k33.segments import Seg7x4
+from luma.core.interface.serial import noop, spi
+from luma.core.legacy import show_message, text
+from luma.core.legacy.font import CP437_FONT, proportional
 from luma.core.render import canvas
-from luma.core.legacy import text, show_message
-from luma.core.legacy.font import proportional, CP437_FONT
+from luma.led_matrix.device import max7219
 
 LIGHT_LEVEL_TOLERANCE = 5_000
 OPTIOMAL_LIGHT_LEVEL = 40_000
+
+csv_file = open("data.csv", "w", newline="")
+csv_writer = csv.writer(csv_file)
+
+csv_writer.writerow(["Time", "Temperature", "Humidity", "Light Level"])
 
 # Initialisierung des I2C-Displays
 i2c = board.I2C()
@@ -105,9 +113,14 @@ try:
         else:  # optimal
             display_on_matrix(matrix_device, ":)")
 
+        csv_writer.writerow(
+            [datetime.now(), result.temperature, result.humidity, light_level]
+        )
+
         time.sleep(1)  # warten
 
 except KeyboardInterrupt:
+    csv_file.close()
     segment.fill(0)
     lcd.clear()
     lcd.backlight = False
