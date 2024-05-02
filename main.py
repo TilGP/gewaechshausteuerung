@@ -24,10 +24,12 @@ file_exists = False
 if os.path.exists(csv_file_name):
     file_exists = True
 
-csv_file = open(csv_file_name, "a", newline="")
+csv_file = open(csv_file_name, "a", newline="")  # Datei im "append" Modus öffnen
 csv_writer = csv.writer(csv_file)
 
-if not file_exists:
+if (
+    not file_exists
+):  # Wenn die Datei noch nicht existiert, dann soll der Header geschrieben werden
     csv_writer.writerow(
         [
             "Datum",
@@ -129,7 +131,7 @@ try:
             display_on_matrix(matrix_device, ":)")
 
         dt = datetime.now()
-        csv_writer.writerow(
+        csv_writer.writerow(  # Schreibe die Messwerte in die CSV-Datei
             [
                 dt.strftime("%d.%m.%Y"),
                 dt.strftime("%H:%M:%S"),
@@ -141,10 +143,9 @@ try:
 
         time.sleep(1)  # warten
 
-except KeyboardInterrupt:
-    csv_file.close()
-    segment.fill(0)
-    lcd.clear()
-    lcd.backlight = False
-    display_on_matrix(matrix_device, "")
-    pass
+except KeyboardInterrupt:  # Wenn STRG+C gedrückt wird, dann...
+    csv_file.close()  # ... schließe die CSV-Datei
+    segment.fill(0)  # Lösche die Anzeige auf dem 7-Segment-Display
+    lcd.clear()  # Lösche die Anzeige auf dem LCD
+    lcd.backlight = False  # Schalte die Hintergrundbeleuchtung des LCDs aus
+    display_on_matrix(matrix_device, "")  # Lösche die Anzeige auf der Matrix
