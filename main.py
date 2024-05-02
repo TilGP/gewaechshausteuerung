@@ -24,7 +24,7 @@ file_exists = False
 if os.path.exists(csv_file_name):
     file_exists = True
 
-csv_file = open(csv_file_name, "w", newline="")
+csv_file = open(csv_file_name, "a", newline="")
 csv_writer = csv.writer(csv_file)
 
 if not file_exists:
