@@ -11,7 +11,7 @@ import RPi.GPIO as GPIO
 import smbus
 from adafruit_ht16k33.segments import Seg7x4
 from luma.core.interface.serial import noop, spi
-from luma.core.legacy import show_message, text
+from luma.core.legacy import text
 from luma.core.legacy.font import CP437_FONT, proportional
 from luma.core.render import canvas
 from luma.led_matrix.device import max7219
@@ -37,6 +37,7 @@ if (
             "Temperatur (in °C)",
             "Luftfeuchtigkeit (in %)",
             "Helligkeit (in Lux)",
+            "Relay Status",
         ]
     )
 
@@ -50,6 +51,12 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.cleanup()
 instance = dht11.DHT11(pin=4)
+
+# Setze den Relay Pin auf aus
+RELAY_PIN = 40
+GPIO.setup(RELAY_PIN, GPIO.OUT)
+GPIO.output(RELAY_PIN, GPIO.LOW)
+reelay_state = False
 
 # Definiere LCD Zeilen und Spaltenanzahl.
 LCD_COLUMNS = 16
@@ -125,8 +132,14 @@ try:
         # Anzeige auf der Matrix je nach Lichtpegel
         if light_level > OPTIOMAL_LIGHT_LEVEL + LIGHT_LEVEL_TOLERANCE:  # zu hell
             display_on_matrix(matrix_device, ":o")
+            if reelay_state:
+                GPIO.output(RELAY_PIN, GPIO.LOW)
+                reelay_state = False
         elif light_level < OPTIOMAL_LIGHT_LEVEL - LIGHT_LEVEL_TOLERANCE:  # zu dunkel
             display_on_matrix(matrix_device, ":(")
+            if not reelay_state:
+                GPIO.output(RELAY_PIN, GPIO.HIGH)
+                reelay_state = True
         else:  # optimal
             display_on_matrix(matrix_device, ":)")
 
@@ -138,6 +151,7 @@ try:
                 round(result.temperature, 2),
                 round(result.humidity, 2),
                 round(light_level, 2),
+                "An" if reelay_state else "Aus",
             ]
         )
 
