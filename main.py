@@ -47,9 +47,9 @@ segment = Seg7x4(i2c, address=0x70)
 segment.fill(0)
 
 # Initialisierung des GPIO-Pins für den DHT11-Sensor
+GPIO.cleanup()
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
-GPIO.cleanup()
 instance = dht11.DHT11(pin=4)
 
 # Setze den Relay Pin auf aus
