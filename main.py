@@ -53,7 +53,7 @@ GPIO.setmode(GPIO.BCM)
 instance = dht11.DHT11(pin=4)
 
 # Setze den Relay Pin auf aus
-RELAY_PIN = 40
+RELAY_PIN = 21
 GPIO.setup(RELAY_PIN, GPIO.OUT)
 relay_state = False
 
