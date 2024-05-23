@@ -55,8 +55,7 @@ instance = dht11.DHT11(pin=4)
 # Setze den Relay Pin auf aus
 RELAY_PIN = 40
 GPIO.setup(RELAY_PIN, GPIO.OUT)
-GPIO.output(RELAY_PIN, GPIO.LOW)
-reelay_state = False
+relay_state = False
 
 # Definiere LCD Zeilen und Spaltenanzahl.
 LCD_COLUMNS = 16
@@ -105,6 +104,13 @@ light_sensor = LightSensor()
 try:
     print("STRG+C Druecken zum Beenden.")
     while True:
+        # Setzt die variable is_night auf True wenn es zwischen 20:00 und 6:00 uhr ist
+        now = datetime.now()
+        if (now.hour >= 6) or (now.hour < 18):
+            sun_time = True
+        else:
+            sun_time = False
+
         # Daten vom DHT11-Sensor auslesen
         result = instance.read()
         while (
@@ -128,30 +134,33 @@ try:
 
         # Aktuellen Lichtpegel messen
         light_level = light_sensor.readLight()
+        needs_light = False
 
         # Anzeige auf der Matrix je nach Lichtpegel
         if light_level > OPTIOMAL_LIGHT_LEVEL + LIGHT_LEVEL_TOLERANCE:  # zu hell
             display_on_matrix(matrix_device, ":o")
-            if reelay_state:
-                GPIO.output(RELAY_PIN, GPIO.LOW)
-                reelay_state = False
+            needs_light = False
         elif light_level < OPTIOMAL_LIGHT_LEVEL - LIGHT_LEVEL_TOLERANCE:  # zu dunkel
             display_on_matrix(matrix_device, ":(")
-            if not reelay_state:
-                GPIO.output(RELAY_PIN, GPIO.HIGH)
-                reelay_state = True
+            needs_light = True
         else:  # optimal
             display_on_matrix(matrix_device, ":)")
 
-        dt = datetime.now()
+        if sun_time and needs_light:
+            GPIO.output(RELAY_PIN, GPIO.LOW)
+            relay_state = True
+        else:
+            GPIO.output(RELAY_PIN, GPIO.HIGH)
+            relay_state = False
+
         csv_writer.writerow(  # Schreibe die Messwerte in die CSV-Datei
             [
-                dt.strftime("%d.%m.%Y"),
-                dt.strftime("%H:%M:%S"),
+                now.strftime("%d.%m.%Y"),
+                now.strftime("%H:%M:%S"),
                 round(result.temperature, 2),
                 round(result.humidity, 2),
                 round(light_level, 2),
-                "An" if reelay_state else "Aus",
+                "An" if relay_state else "Aus",
             ]
         )
 
