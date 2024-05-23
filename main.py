@@ -146,11 +146,11 @@ try:
         else:  # optimal
             display_on_matrix(matrix_device, ":)")
 
-        if sun_time and needs_light:
-            GPIO.output(RELAY_PIN, GPIO.LOW)
+        if needs_light:
+            GPIO.output(RELAY_PIN, GPIO.HIGH)
             relay_state = True
         else:
-            GPIO.output(RELAY_PIN, GPIO.HIGH)
+            GPIO.output(RELAY_PIN, GPIO.LOW)
             relay_state = False
 
         csv_writer.writerow(  # Schreibe die Messwerte in die CSV-Datei
