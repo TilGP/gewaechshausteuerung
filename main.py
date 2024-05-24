@@ -107,9 +107,9 @@ try:
         # Setzt die variable is_night auf True wenn es zwischen 20:00 und 6:00 uhr ist
         now = datetime.now()
         if (now.hour >= 6) or (now.hour < 18):
-            sun_time = True
+            is_day = True
         else:
-            sun_time = False
+            is_day = False
 
         # Daten vom DHT11-Sensor auslesen
         result = instance.read()
@@ -146,7 +146,7 @@ try:
         else:  # optimal
             display_on_matrix(matrix_device, ":)")
 
-        if needs_light:
+        if is_day and needs_light:
             GPIO.output(RELAY_PIN, GPIO.LOW)
             relay_state = True
         else:
