@@ -191,7 +191,7 @@ try:
 
         # daten in die datenbank speichern
         cursor.execute(
-            "INSERT INTO messwerte (Zeit, Datum, Relayzustand, Temperatur, Luftfeuchte, Helligkeit, Bewertung_der_Helligkeit) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO messwerte (Zeit, Datum, Relayzustand, Temperatur, Luftfeuchte, Helligkeit, Bewertung_der_Helligkeit) VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 now.strftime("%d.%m.%Y"),
                 now.strftime("%H:%M:%S"),
