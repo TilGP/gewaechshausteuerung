@@ -7,6 +7,7 @@ import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import board
 import busio
 import dht11
+import sqlite3
 import RPi.GPIO as GPIO
 import smbus
 from adafruit_ht16k33.segments import Seg7x4
@@ -18,6 +19,25 @@ from luma.led_matrix.device import max7219
 
 LIGHT_LEVEL_TOLERANCE = 5_000
 OPTIOMAL_LIGHT_LEVEL = 40_000
+
+# baue datenbank verbindung auf
+conn = sqlite3.connect("data.db")
+cursor = conn.cursor()
+cursor.execute(
+    """
+CREATE TABLE IF NOT EXISTS messwerte (
+    id INTEGER PRIMARY KEY,
+    Datum TEXT NOT NULL,
+    Zeit TEXT NOT NULL,
+    Relayzusatnd TEXT,
+    Temperatur TEXT,
+    Luftfeuchte TEXT,
+    Helligkeit TEXT,
+    Bewertung_der_Helligkeit TEXT
+)
+"""
+)
+conn.commit()
 
 csv_file_name = "data.csv"
 file_exists = False
@@ -37,6 +57,7 @@ if (
             "Temperatur (in °C)",
             "Luftfeuchtigkeit (in %)",
             "Helligkeit (in Lux)",
+            "Helligkeit Bewertung",
             "Relay Status",
         ]
     )
@@ -135,14 +156,17 @@ try:
         # Aktuellen Lichtpegel messen
         light_level = light_sensor.readLight()
         needs_light = False
+        light_level_evaluation = "Optimal"
 
         # Anzeige auf der Matrix je nach Lichtpegel
         if light_level > OPTIOMAL_LIGHT_LEVEL + LIGHT_LEVEL_TOLERANCE:  # zu hell
             display_on_matrix(matrix_device, ":o")
             needs_light = False
+            light_level_evaluation = "Zu hell"
         elif light_level < OPTIOMAL_LIGHT_LEVEL - LIGHT_LEVEL_TOLERANCE:  # zu dunkel
             display_on_matrix(matrix_device, ":(")
             needs_light = True
+            light_level_evaluation = "Zu dunkel"
         else:  # optimal
             display_on_matrix(matrix_device, ":)")
 
@@ -160,9 +184,25 @@ try:
                 round(result.temperature, 2),
                 round(result.humidity, 2),
                 round(light_level, 2),
+                light_level_evaluation,
                 "An" if relay_state else "Aus",
             ]
         )
+
+        # daten in die datenbank speichern
+        cursor.execute(
+            "INSERT INTO messwerte (Zeit, Datum, Relayzustand, Temperatur, Luftfeuchte, Helligkeit, Bewertung_der_Helligkeit) VALUES (?, ?, ?, ?, ?, ?)",
+            (
+                now.strftime("%d.%m.%Y"),
+                now.strftime("%H:%M:%S"),
+                round(result.temperature, 2),
+                round(result.humidity, 2),
+                round(light_level, 2),
+                light_level_evaluation,
+                "An" if relay_state else "Aus",
+            ),
+        )
+        conn.commit()
 
         time.sleep(1)  # warten
 
