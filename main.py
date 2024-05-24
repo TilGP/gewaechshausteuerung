@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS messwerte (
     id INTEGER PRIMARY KEY,
     Datum TEXT NOT NULL,
     Zeit TEXT NOT NULL,
-    Relayzusatnd TEXT,
+    Relayzustand TEXT,
     Temperatur TEXT,
     Luftfeuchte TEXT,
     Helligkeit TEXT,
