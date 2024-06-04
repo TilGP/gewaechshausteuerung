@@ -30,9 +30,9 @@ CREATE TABLE IF NOT EXISTS messwerte (
     Datum TEXT NOT NULL,
     Zeit TEXT NOT NULL,
     Relayzustand TEXT,
-    Temperatur TEXT,
-    Luftfeuchte TEXT,
-    Helligkeit TEXT,
+    Temperatur REAL,
+    Luftfeuchte REAL,
+    Helligkeit REAL,
     Bewertung_der_Helligkeit TEXT
 )
 """
@@ -191,7 +191,7 @@ try:
 
         # daten in die datenbank speichern
         cursor.execute(
-            "INSERT INTO messwerte (Zeit, Datum, Relayzustand, Temperatur, Luftfeuchte, Helligkeit, Bewertung_der_Helligkeit) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO messwerte (Zeit, Datum, Temperatur, Luftfeuchte, Helligkeit, Bewertung_der_Helligkeit, Relayzustand) VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 now.strftime("%d.%m.%Y"),
                 now.strftime("%H:%M:%S"),
