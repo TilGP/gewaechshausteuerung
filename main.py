@@ -17,10 +17,11 @@ from luma.core.legacy.font import CP437_FONT, proportional
 from luma.core.render import canvas
 from luma.led_matrix.device import max7219
 
+# Konstanten für die Lichtsteuerung/-bewertung
 LIGHT_LEVEL_TOLERANCE = 5_000
 OPTIOMAL_LIGHT_LEVEL = 40_000
 
-# baue datenbank verbindung auf
+# baue die datenbank verbindung auf
 conn = sqlite3.connect("data.db")
 cursor = conn.cursor()
 cursor.execute(
@@ -39,6 +40,7 @@ CREATE TABLE IF NOT EXISTS messwerte (
 )
 conn.commit()
 
+# CSV-Datei initialisieren
 csv_file_name = "data.csv"
 file_exists = False
 if os.path.exists(csv_file_name):
@@ -170,6 +172,7 @@ try:
         else:  # optimal
             display_on_matrix(matrix_device, ":)")
 
+        # Schalte das Relay an, wenn es Tag ist und Licht benötigt wird
         if is_day and needs_light:
             GPIO.output(RELAY_PIN, GPIO.LOW)
             relay_state = True
